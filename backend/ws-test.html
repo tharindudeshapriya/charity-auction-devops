@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Charity Auction - WebSocket Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
+        #log { background: #fff; border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; margin-top: 10px; border-radius: 4px; }
+        .msg { margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+        .bid { color: #2e7d32; font-weight: bold; }
+        .controls { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        label { font-weight: bold; }
+        input[type="number"] { padding: 9px; border: 1px solid #ccc; border-radius: 4px; width: 80px; font-size: 14px; }
+        button { padding: 10px 20px; cursor: pointer; background: #1976d2; color: white; border: none; border-radius: 4px; }
+        button:disabled { background: #ccc; cursor: default; }
+        #topic-label { font-style: italic; color: #555; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <h2>Auction Bid Monitor</h2>
+
+    <div class="controls">
+        <label for="itemId">Item ID:</label>
+        <input type="number" id="itemId" value="1" min="1" placeholder="e.g. 1" />
+        <button id="connect">Connect to WebSocket</button>
+        <button id="disconnect" disabled>Disconnect</button>
+    </div>
+    <p id="topic-label">Subscribing to: <code>/topic/items/<span id="topic-id">1</span>/bids</code></p>
+    <div id="log"></div>
+
+    <script>
+        var stompClient = null;
+
+        // Update the topic label live as the user types
+        document.getElementById('itemId').addEventListener('input', function() {
+            document.getElementById('topic-id').textContent = this.value || '?';
+        });
+
+        function setConnected(connected) {
+            document.getElementById('connect').disabled = connected;
+            document.getElementById('disconnect').disabled = !connected;
+            document.getElementById('itemId').disabled = connected;
+            log(connected ? "CONNECTED" : "DISCONNECTED", true);
+        }
+
+        function log(message, isInfo) {
+            var div = document.createElement('div');
+            div.className = 'msg' + (isInfo ? '' : ' bid');
+            div.appendChild(document.createTextNode(new Date().toLocaleTimeString() + ' — ' + message));
+            var logDiv = document.getElementById('log');
+            logDiv.appendChild(div);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        document.getElementById('connect').onclick = function() {
+            var itemId = document.getElementById('itemId').value;
+            if (!itemId || itemId < 1) {
+                alert('Please enter a valid Item ID before connecting.');
+                return;
+            }
+
+            var topic = '/topic/items/' + itemId + '/bids';
+            log('Connecting and subscribing to ' + topic + ' ...', true);
+
+            var socket = new SockJS('http://localhost:8080/ws-auction');
+            stompClient = Stomp.over(socket);
+            stompClient.debug = null; // Suppress verbose STOMP logs in console
+
+            stompClient.connect({}, function (frame) {
+                setConnected(true);
+                log('Handshake successful: ' + frame, true);
+
+                stompClient.subscribe(topic, function (message) {
+                    log("NEW BID RECEIVED: " + message.body);
+                });
+            }, function(error) {
+                log('Connection Error: ' + error, true);
+                setConnected(false);
+            });
+        };
+
+        document.getElementById('disconnect').onclick = function() {
+            if (stompClient !== null) {
+                stompClient.disconnect();
+            }
+            setConnected(false);
+        };
+    </script>
+</body>
+</html>

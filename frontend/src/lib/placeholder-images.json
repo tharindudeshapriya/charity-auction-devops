@@ -1,0 +1,40 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-auction",
+      "description": "High-end auction house interior",
+      "imageUrl": "https://picsum.photos/seed/auction1/1200/800",
+      "imageHint": "auction gallery"
+    },
+    {
+      "id": "item-watch",
+      "description": "Luxury vintage watch",
+      "imageUrl": "https://picsum.photos/seed/watch/600/400",
+      "imageHint": "vintage watch"
+    },
+    {
+      "id": "item-art",
+      "description": "Modern abstract painting",
+      "imageUrl": "https://picsum.photos/seed/art/600/400",
+      "imageHint": "abstract painting"
+    },
+    {
+      "id": "item-car",
+      "description": "Classic vintage sports car",
+      "imageUrl": "https://picsum.photos/seed/car/600/400",
+      "imageHint": "classic car"
+    },
+    {
+      "id": "item-jewelry",
+      "description": "Elegant diamond necklace",
+      "imageUrl": "https://picsum.photos/seed/jewelry/600/400",
+      "imageHint": "diamond necklace"
+    },
+    {
+      "id": "item-experience",
+      "description": "Luxury travel destination",
+      "imageUrl": "https://picsum.photos/seed/travel/600/400",
+      "imageHint": "luxury travel"
+    }
+  ]
+}
