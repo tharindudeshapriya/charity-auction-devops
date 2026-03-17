@@ -1,0 +1,16 @@
+target/
+.git/
+.gitignore
+.gemini/
+.agent/
+.agents/
+Dockerfile
+.dockerignore
+*.md
+mvnw
+mvnw.cmd
+.mvn/
+help/
+Postman/
+ws-test.html
+*.json
