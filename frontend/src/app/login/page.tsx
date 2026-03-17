@@ -25,7 +25,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+
   const { login } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
@@ -55,7 +55,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      
+
       <main className="flex-grow flex items-center justify-center pt-32 pb-24 px-6 relative overflow-hidden">
         {/* Decorative Background Elements */}
         <div className="absolute top-1/4 -left-12 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
@@ -81,14 +81,14 @@ export default function LoginPage() {
                   <Label htmlFor="email">Email Address / Username</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-                    <Input 
-                      id="email" 
-                      type="text" 
-                      placeholder="admin" 
-                      className="pl-10 py-6 rounded-xl" 
+                    <Input
+                      id="email"
+                      type="text"
+                      placeholder="Username"
+                      className="pl-10 py-6 rounded-xl"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      required 
+                      required
                     />
                   </div>
                 </div>
@@ -99,14 +99,14 @@ export default function LoginPage() {
                   </div>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-                    <Input 
-                      id="password" 
-                      type="password" 
-                      placeholder="••••••••" 
-                      className="pl-10 py-6 rounded-xl" 
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      className="pl-10 py-6 rounded-xl"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      required 
+                      required
                     />
                   </div>
                 </div>
@@ -143,7 +143,7 @@ export default function LoginPage() {
                     <Gavel size={32} />
                   </div>
                   <DialogDescription className="text-base text-foreground leading-relaxed">
-                    This platform is currently in the development phase. 
+                    This platform is currently in the development phase.
                     <br /><br />
                     To add new users, please log in with the <strong>Admin</strong> account and create user profiles directly from the User Management dashboard.
                   </DialogDescription>

@@ -19,7 +19,7 @@ services:
       start_period: 10s
 
   backend:
-    build: .
+    build: ./backend
     container_name: charity-auction-backend
     depends_on:
       mysql:
@@ -33,6 +33,15 @@ services:
       - SPRING_DATASOURCE_USERNAME=${DB_USER}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
 
+    restart: always
+
+  frontend:
+    build: ./frontend
+    container_name: charity-auction-frontend
+    ports:
+      - "9002:9002"
+    depends_on:
+      - backend
     restart: always
 
 volumes:
