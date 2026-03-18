@@ -6,8 +6,7 @@ pipeline {
         APP_REPO = "charity-auction-devops"
         MANIFEST_REPO = "charity-auction-gitops-manifests"
         GITHUB_USER = "tharindudeshapriya"
-        // This will be used to inject the API URL into the frontend build
-        MASTER_IP = "3.239.192.96" 
+        MASTER_IP = "3.239.192.96" // API URL for frontend
     }
 
     stages {
@@ -15,6 +14,7 @@ pipeline {
             steps {
                 script {
                     dir('backend') {
+                        // Build backend image
                         def backendImage = docker.build("${DOCKER_USER}/charity-backend:${env.BUILD_NUMBER}", ".")
                         docker.withRegistry('', 'docker-hub-creds') {
                             backendImage.push()
@@ -29,10 +29,10 @@ pipeline {
             steps {
                 script {
                     dir('frontend') {
-                        // Injecting the Master IP as the API URL for the Next.js build
+                        // Build frontend image with API URL build-arg
                         def frontendImage = docker.build(
                             "${DOCKER_USER}/charity-frontend:${env.BUILD_NUMBER}", 
-                            "--build-arg NEXT_PUBLIC_API_URL=http://${env.MASTER_IP}/api ."
+                            "--build-arg NEXT_PUBLIC_API_URL=http://${MASTER_IP}/api ."
                         )
                         docker.withRegistry('', 'docker-hub-creds') {
                             frontendImage.push()
@@ -47,19 +47,20 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github-token', passwordVariable: 'GIT_TOKEN', usernameVariable: 'GIT_USER')]) {
                     sh """
-                        git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/${GITHUB_USER}/${MANIFEST_REPO}.git
-                        cd ${MANIFEST_REPO}
+                        # Clone manifest repo securely
+                        git clone https://\$GIT_USER:\$GIT_TOKEN@github.com/\$GITHUB_USER/\$MANIFEST_REPO.git
+                        cd \$MANIFEST_REPO
                         
-                        # Update Backend Image Tag
-                        sed -i "s|image: ${DOCKER_USER}/charity-backend:.*|image: ${DOCKER_USER}/charity-backend:${BUILD_NUMBER}|g" backend-deployment.yaml
+                        # Update backend image tag
+                        sed -i "s|image: ${DOCKER_USER}/charity-backend:.*|image: ${DOCKER_USER}/charity-backend:\$BUILD_NUMBER|g" backend-deployment.yaml
                         
-                        # Update Frontend Image Tag
-                        sed -i "s|image: ${DOCKER_USER}/charity-frontend:.*|image: ${DOCKER_USER}/charity-frontend:${BUILD_NUMBER}|g" frontend-deployment.yaml
+                        # Update frontend image tag
+                        sed -i "s|image: ${DOCKER_USER}/charity-frontend:.*|image: ${DOCKER_USER}/charity-frontend:\$BUILD_NUMBER|g" frontend-deployment.yaml
                         
                         git config user.email "jenkins@gitops.com"
                         git config user.name "Jenkins CI"
                         git add .
-                        git commit -m "chore: update images to build ${BUILD_NUMBER}"
+                        git commit -m "chore: update images to build \$BUILD_NUMBER"
                         git push origin main
                     """
                 }
