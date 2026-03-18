@@ -15,7 +15,7 @@ pipeline {
             steps {
                 script {
                     dir('backend') {
-                        def backendImage = docker.build("${DOCKER_USER}/charity-backend:${env.BUILD_NUMBER}")
+                        def backendImage = docker.build("${DOCKER_USER}/charity-backend:${env.BUILD_NUMBER}", ".")
                         docker.withRegistry('', 'docker-hub-creds') {
                             backendImage.push()
                             backendImage.push('latest')
@@ -32,7 +32,7 @@ pipeline {
                         // Injecting the Master IP as the API URL for the Next.js build
                         def frontendImage = docker.build(
                             "${DOCKER_USER}/charity-frontend:${env.BUILD_NUMBER}", 
-                            "--build-arg NEXT_PUBLIC_API_URL=http://${env.MASTER_IP}/api"
+                            "--build-arg NEXT_PUBLIC_API_URL=http://${env.MASTER_IP}/api ."
                         )
                         docker.withRegistry('', 'docker-hub-creds') {
                             frontendImage.push()
