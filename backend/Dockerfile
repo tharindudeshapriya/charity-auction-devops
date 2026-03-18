@@ -29,5 +29,6 @@ RUN chown -R appuser:appgroup /app
 # Switch to the non-root user
 USER appuser
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# CRITICAL: Limit Java's memory so it doesn't crash your worker nodes
+ENV JAVA_OPTS="-Xmx512m -Xms256m"
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
