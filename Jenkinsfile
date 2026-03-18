@@ -30,7 +30,10 @@ pipeline {
                 script {
                     dir('frontend') {
                         // Injecting the Master IP as the API URL for the Next.js build
-                        def frontendImage = docker.build("${DOCKER_USER}/charity-frontend:${env.BUILD_NUMBER}", "--build-arg NEXT_PUBLIC_API_URL=http://${env.MASTER_IP}/api")
+                        def frontendImage = docker.build(
+                            "${DOCKER_USER}/charity-frontend:${env.BUILD_NUMBER}", 
+                            "--build-arg NEXT_PUBLIC_API_URL=http://${env.MASTER_IP}/api"
+                        )
                         docker.withRegistry('', 'docker-hub-creds') {
                             frontendImage.push()
                             frontendImage.push('latest')
@@ -44,19 +47,19 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github-token', passwordVariable: 'GIT_TOKEN', usernameVariable: 'GIT_USER')]) {
                     sh """
-                        git clone https://${GIT_USER}:${GIT_TOKEN}@[github.com/$](https://github.com/$){GITHUB_USER}/${MANIFEST_REPO}.git
+                        git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/${GITHUB_USER}/${MANIFEST_REPO}.git
                         cd ${MANIFEST_REPO}
                         
                         # Update Backend Image Tag
-                        sed -i "s|image: ${DOCKER_USER}/charity-backend:.*|image: ${DOCKER_USER}/charity-backend:${env.BUILD_NUMBER}|g" backend-deployment.yaml
+                        sed -i "s|image: ${DOCKER_USER}/charity-backend:.*|image: ${DOCKER_USER}/charity-backend:${BUILD_NUMBER}|g" backend-deployment.yaml
                         
                         # Update Frontend Image Tag
-                        sed -i "s|image: ${DOCKER_USER}/charity-frontend:.*|image: ${DOCKER_USER}/charity-frontend:${env.BUILD_NUMBER}|g" frontend-deployment.yaml
+                        sed -i "s|image: ${DOCKER_USER}/charity-frontend:.*|image: ${DOCKER_USER}/charity-frontend:${BUILD_NUMBER}|g" frontend-deployment.yaml
                         
                         git config user.email "jenkins@gitops.com"
                         git config user.name "Jenkins CI"
                         git add .
-                        git commit -m "chore: update images to build ${env.BUILD_NUMBER}"
+                        git commit -m "chore: update images to build ${BUILD_NUMBER}"
                         git push origin main
                     """
                 }
