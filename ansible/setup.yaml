@@ -1,0 +1,49 @@
+---
+- name: Play 1 - Pre-requisites for all nodes
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update apt cache and install curl/wget
+      apt:
+        name:
+          - curl
+          - wget
+        state: present
+        update_cache: yes
+
+- name: Play 2 - Setup Master Node
+  hosts: master
+  become: yes
+  tasks:
+    - name: Install Docker (Required for Jenkins builds)
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Install K3s Server (Control Plane)
+      shell: curl -sfL https://get.k3s.io | sh -
+      args:
+        creates: /usr/local/bin/k3s
+
+    - name: Fetch K3s Node Token
+      command: cat /var/lib/rancher/k3s/server/node-token
+      register: k3s_token
+      changed_when: false
+
+    - name: Save Master IP for Workers to use
+      set_fact:
+        master_ip: "{{ ansible_default_ipv4.address }}"  # safer than ansible_host
+
+- name: Play 3 - Setup Worker Nodes
+  hosts: workers
+  become: yes
+  tasks:
+    - name: Install K3s Agent and Join Cluster
+      shell: |
+        curl -sfL https://get.k3s.io | \
+        K3S_URL=https://{{ hostvars[groups['master'][0]]['master_ip'] }}:6443 \
+        K3S_TOKEN={{ hostvars[groups['master'][0]]['k3s_token']['stdout'] }} \
+        sh -
+      args:
+        creates: /usr/local/bin/k3s

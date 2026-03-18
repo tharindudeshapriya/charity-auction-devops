@@ -1,0 +1,41 @@
+---
+- name: Play 1 - Set hostnames for all nodes
+  hosts: all
+  become: yes
+  vars:
+    worker_hostnames:
+      worker_1: gitops-worker1
+      worker_2: gitops-worker2
+  tasks:
+
+    - name: Set hostname for master
+      hostname:
+        name: gitops-master
+      when: "'master' in group_names"
+
+    - name: Set hostname for workers
+      hostname:
+        name: "{{ worker_hostnames[inventory_hostname] }}"
+      when: "'workers' in group_names"
+
+- name: Play 2 - Update /etc/hosts for local resolution
+  hosts: all
+  become: yes
+  tasks:
+    - name: Ensure localhost entry with hostname
+      lineinfile:
+        path: /etc/hosts
+        regexp: '127\.0\.0\.1\s+{{ ansible_hostname }}'
+        line: "127.0.0.1 {{ ansible_hostname }}"
+        state: present
+
+- name: Play 3 - Update bash prompt for all users
+  hosts: all
+  become: yes
+  tasks:
+    - name: Set PS1 prompt for all users
+      lineinfile:
+        path: /etc/bash.bashrc
+        line: 'PS1="\u@\h:\w\$ "'
+        state: present
+        insertafter: EOF
