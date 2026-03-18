@@ -75,3 +75,8 @@ next-env.d.ts
 
 
 secret_key.txt
+
+
+.terraform/
+*.tfstate*
+*.tfvars
