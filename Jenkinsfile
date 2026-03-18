@@ -47,6 +47,9 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github-token', passwordVariable: 'GIT_TOKEN', usernameVariable: 'GIT_USER')]) {
                     sh """
+                        # Clean up any leftover folders from previous failed runs
+                        rm -rf \${MANIFEST_REPO}
+                        
                         # Clone manifest repo securely
                         git clone https://\$GIT_USER:\$GIT_TOKEN@github.com/\$GITHUB_USER/\$MANIFEST_REPO.git
                         cd \$MANIFEST_REPO
