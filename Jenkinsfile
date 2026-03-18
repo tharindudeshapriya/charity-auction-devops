@@ -14,7 +14,7 @@ pipeline {
             steps {
                 script {
                     dir('backend') {
-                        // Build backend image
+                        // Build backend Docker image
                         def backendImage = docker.build("${DOCKER_USER}/charity-backend:${env.BUILD_NUMBER}", ".")
                         docker.withRegistry('', 'docker-hub-creds') {
                             backendImage.push()
@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     dir('frontend') {
-                        // Build frontend image with API URL build-arg
+                        // Build frontend Docker image with API URL build-arg
                         def frontendImage = docker.build(
                             "${DOCKER_USER}/charity-frontend:${env.BUILD_NUMBER}", 
                             "--build-arg NEXT_PUBLIC_API_URL=http://${MASTER_IP}/api ."
