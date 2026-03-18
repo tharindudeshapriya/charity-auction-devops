@@ -89,7 +89,7 @@ export default function Home() {
               Bid for a <span className="text-accent not-italic">Purpose</span>, <br className="hidden md:block" /> Own a <span className="text-accent not-italic">Legacy</span>.
             </h1>
             <p className="text-lg md:text-2xl text-white/90 max-w-3xl mx-auto font-light leading-relaxed">
-              CommuniBid connects extraordinary items with extraordinary impact. Join an elite community of high-impact donors today.
+              Checking the gitOps automation in action
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4 pb-12">
               <Link href="/auctions" className="w-full sm:w-auto">
